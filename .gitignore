@@ -1,2 +1,4 @@
 venv
 lottery.log
+.idea
+.gitignore
