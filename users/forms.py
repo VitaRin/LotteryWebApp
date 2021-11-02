@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Required, Email, Length, EqualTo, ValidationError
 
 
+# Character check for First name and Last name fields.
 def character_check(form, field):
     excluded_chars = "?!'^+%&/()=}][{$#@<>"
     chars_present = ""
@@ -33,13 +34,21 @@ class RegisterForm(FlaskForm):
                                                                                  'characters long.')])
     submit = SubmitField()
 
+    # Password validation check to see if it contains characters needed.
     def validate_password(self, password):
         p = re.compile(r'(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*\W)')
         if not p.match(self.password.data):
             raise ValidationError("Password must contain at least 1 digit, 1 lowercase, 1 uppercase and "
                                   "1 special character.")
 
+    # Phone validation to check for correct formatting
     def validate_phone(self, phone):
         p = re.compile(r'\d{4}-\d{3}-\d{4}')
         if not p.match(self.phone.data):
-            raise ValidationError("Please use the following phone format: XXXX-XXX-XXXX.")
+            raise ValidationError("Please use the following phone format (including the dashes): XXXX-XXX-XXXX.")
+
+
+class LoginForm(FlaskForm):
+    username = StringField(validators=[Required(), Email()])
+    password = PasswordField(validators=[Required()])
+    submit = SubmitField()
