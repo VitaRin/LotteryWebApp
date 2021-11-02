@@ -1,4 +1,7 @@
+import base64
 from datetime import datetime
+from Crypto.Protocol.KDF import scrypt
+from Crypto.Random import get_random_bytes
 from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
 from app import db
@@ -14,21 +17,21 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     pin_key = db.Column(db.String(100), nullable=False)
 
-    # User activity information
+    # User activity information.
     registered_on = db.Column(db.DateTime, nullable=True)
     last_logged_in = db.Column(db.DateTime, nullable=True)
     current_logged_in = db.Column(db.DateTime, nullable=True)
 
-    # User information
+    # User information.
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False, default='user')
 
-    # crypto key for user's lottery draws
+    # Crypto key for user's lottery draws.
     draw_key = db.Column(db.BLOB)
 
-    # Define the relationship to Draw
+    # Define the relationship to Draw.
     draws = db.relationship('Draw')
 
     def __init__(self, email, firstname, lastname, phone, password, pin_key, role):
@@ -38,7 +41,7 @@ class User(db.Model, UserMixin):
         self.phone = phone
         self.password = generate_password_hash(password)
         self.pin_key = pin_key
-        self.draw_key = None
+        self.draw_key = base64.urlsafe_b64encode(scrypt(password, str(get_random_bytes(32)), 32, N=2 ** 14, r=8, p=1))
         self.role = role
         self.registered_on = datetime.now()
         self.last_logged_in = None

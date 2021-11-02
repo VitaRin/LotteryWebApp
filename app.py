@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lottery.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'LongAndRandomSecretKey'
 
-# initialise database
+# Initialise database
 db = SQLAlchemy(app)
 
 
@@ -54,12 +54,12 @@ if __name__ == "__main__":
     free_socket.close()
 
     # BLUEPRINTS
-    # import blueprints
+    # Import blueprints
     from users.views import users_blueprint
     from admin.views import admin_blueprint
     from lottery.views import lottery_blueprint
 
-    # register blueprints with app
+    # Register blueprints with app
     app.register_blueprint(users_blueprint)
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(lottery_blueprint)

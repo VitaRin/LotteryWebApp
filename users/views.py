@@ -14,23 +14,23 @@ users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
 
 # VIEWS
-# view registration
+# View registration.
 @users_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
-    # create signup form object
+    # Create signup form object.
     form = RegisterForm()
 
-    # if request method is POST or form is valid
+    # If request method is POST or form is valid.
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        # if this returns a user, then the email already exists in database
+        # If this returns a user, then the email already exists in database.
 
-        # if email already exists redirect user back to signup page with error message so user can try again
+        # If email already exists redirect user back to signup page with error message so user can try again.
         if user:
             flash('Email address already exists')
             return render_template('register.html', form=form)
 
-        # create a new user with the form data
+        # Create a new user with the form data.
         new_user = User(email=form.email.data,
                         firstname=form.firstname.data,
                         lastname=form.lastname.data,
@@ -39,17 +39,17 @@ def register():
                         pin_key=form.pin_key.data,
                         role='user')
 
-        # add the new user to the database
+        # Add the new user to the database.
         db.session.add(new_user)
         db.session.commit()
 
-        # sends user to login page
+        # Sends user to login page.
         return redirect(url_for('users.login'))
-    # if request method is GET or form not valid re-render signup page
+    # If request method is GET or form not valid re-render signup page.
     return render_template('register.html', form=form)
 
 
-# view user login
+# View user login.
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -60,13 +60,13 @@ def login():
     return render_template('login.html', form=form)
 
 
-# view user profile
+# View user profile.
 @users_blueprint.route('/profile')
 def profile():
     return render_template('profile.html', name="PLACEHOLDER FOR FIRSTNAME")
 
 
-# view user account
+# View user account.
 @users_blueprint.route('/account')
 def account():
     return render_template('account.html',
