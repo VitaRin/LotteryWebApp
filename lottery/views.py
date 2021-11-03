@@ -1,4 +1,5 @@
 # IMPORTS
+import copy
 import logging
 from flask import Blueprint, render_template, request, flash
 from app import db
@@ -46,8 +47,20 @@ def view_draws():
 
     # If playable draws exist.
     if len(playable_draws) != 0:
+
+        # Create a list of copied draws which are independent of the database.
+        draw_copies = list(map(lambda x: copy.deepcopy(x), playable_draws))
+
+        # Empty list for decrypted copied draws.
+        decrypted_draws = []
+
+        # Decrypt each draw and add it to decrypted_draws array.
+        for d in draw_copies:
+            d.view_draw(draw_key)
+            decrypted_draws.append(d)
+
         # Re-render lottery page with playable draws.
-        return render_template('lottery.html', playable_draws=playable_draws)
+        return render_template('lottery.html', playable_draws=decrypted_draws)
     else:
         flash('No playable draws.')
         return lottery()
