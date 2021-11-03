@@ -2,9 +2,15 @@ import base64
 from datetime import datetime
 from Crypto.Protocol.KDF import scrypt
 from Crypto.Random import get_random_bytes
+from cryptography.fernet import Fernet
 from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
 from app import db
+
+
+# Encrypts lottery draws
+def encrypt(data, draw_key):
+    return Fernet(draw_key).encrypt(bytes(data, 'utf-8'))
 
 
 class User(db.Model, UserMixin):
@@ -59,9 +65,9 @@ class Draw(db.Model):
     win = db.Column(db.BOOLEAN, nullable=False)
     round = db.Column(db.Integer, nullable=False, default=0)
 
-    def __init__(self, user_id, draw, win, round):
+    def __init__(self, user_id, draw, win, round, draw_key):
         self.user_id = user_id
-        self.draw = draw
+        self.draw = encrypt(draw, draw_key)
         self.played = False
         self.match = False
         self.win = win
