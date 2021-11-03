@@ -15,7 +15,7 @@
                     <div class="field">
                         {{ form.csrf_token() }}
                         <div class="control">
-                            {{ form.username(class="input", placeholder="Username") }}
+                            {{ form.username(class="input", placeholder="Username (Email)") }}
                             {% for error in form.username.errors %}
                                 {{ error }}
                             {% endfor %}

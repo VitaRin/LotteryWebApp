@@ -1,10 +1,10 @@
 # IMPORTS
 import logging
 from functools import wraps
-
+from datetime import datetime
 from flask import Blueprint, render_template, flash, redirect, url_for, request
-from flask_login import current_user
-
+from flask_login import login_user, logout_user, current_user
+from werkzeug.security import check_password_hash
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm
@@ -55,9 +55,34 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+
+        # Check whether the entered email is in the database.
+        user = User.query.filter_by(email=form.username.data).first()
+
+        # Check if the entered password matches the password stored in the database.
+        if not user or not check_password_hash(user.password, form.password.data):
+            flash('Please check your login details and try again.')
+
+            return render_template('login.html', form=form)
+
+        login_user(user)
+
+        # Update the user's last and current login times.
+        user.last_logged_in = user.current_logged_in
+        user.current_logged_in = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+
         return render_template('profile.html')
 
     return render_template('login.html', form=form)
+
+
+# Logout user.
+@users_blueprint.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 # View user profile.
