@@ -75,7 +75,18 @@ def check_draws():
 
     # If played draws exist.
     if len(played_draws) != 0:
-        return render_template('lottery.html', results=played_draws, played=True)
+        # Create a list of copied draws which are independent of the database.
+        draw_copies = list(map(lambda x: copy.deepcopy(x), played_draws))
+
+        # Empty list for decrypted copied draws.
+        decrypted_draws = []
+
+        # Decrypt each draw and add it to decrypted_draws array.
+        for d in draw_copies:
+            d.view_draw(current_user.draw_key)
+            decrypted_draws.append(d)
+
+        return render_template('lottery.html', results=draw_copies, played=True)
 
     # If no played draws exist [all draw entries have been played therefore wait for next lottery round].
     else:
