@@ -43,6 +43,9 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        # Update logs that a new user has registered.
+        logging.warning('SECURITY - User registration [%s, %s]', form.email.data, request.remote_addr)
+
         # Sends user to login page.
         return redirect(url_for('users.login'))
     # If request method is GET or form not valid re-render signup page.
@@ -73,6 +76,9 @@ def login():
         # Check if the entered password matches the password stored in the database.
         if not user or not check_password_hash(user.password, form.password.data):
 
+            # Update logs that an invalid login attempt was made.
+            logging.warning('SECURITY - Invalid login attempt [%s, %s]', form.username.data, request.remote_addr)
+
             # If no match create an appropriate error message based on login attempts.
             if session['logins'] == 3:
                 flash('Number of incorrect logins exceeded.')
@@ -91,8 +97,10 @@ def login():
         # Update the user's last and current login times.
         user.last_logged_in = user.current_logged_in
         user.current_logged_in = datetime.now()
-        db.session.add(user)
         db.session.commit()
+
+        # Update logs that a user has logged in.
+        logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
 
         if current_user.role == 'admin':
             return redirect(url_for('admin.admin'))
@@ -106,6 +114,9 @@ def login():
 @users_blueprint.route('/logout')
 @login_required
 def logout():
+    # Update logs that a user has logged out.
+    logging.warning('SECURITY - Log out [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
+
     logout_user()
     return redirect(url_for('index'))
 
