@@ -21,6 +21,7 @@ def lottery():
 
 @lottery_blueprint.route('/add_draw', methods=['POST'])
 @login_required
+@requires_roles('user')
 def add_draw():
     submitted_draw = ''
     for i in range(6):

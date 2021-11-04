@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, flash, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
-from app import db
+from app import db, requires_roles
 from models import User
 from users.forms import RegisterForm, LoginForm
 
@@ -124,6 +124,7 @@ def logout():
 # View user profile.
 @users_blueprint.route('/profile')
 @login_required
+@requires_roles('user')
 def profile():
     return render_template('profile.html', name=current_user.firstname)
 
