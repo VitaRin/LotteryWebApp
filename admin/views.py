@@ -85,7 +85,7 @@ def view_winning_draw():
         return render_template('admin.html', winning_draw=winning_draw_copy, name=current_user.firstname)
 
     # If no winning draw exists, rerender admin page.
-    flash("No winning draw exists. Please add winning draw.")
+    flash("No winning draw exists. Please add a winning draw.")
     return admin()
 
 
