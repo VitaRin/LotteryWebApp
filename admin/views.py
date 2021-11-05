@@ -59,6 +59,7 @@ def create_winning_draw():
             valid = False
             flash('Please do not leave any values blank.')
         else:
+            # If the value isn't blank, check if it's within allowed range.
             if int(input_draw) > 60 or int(input_draw) < 1:
                 valid = False
                 flash('Draw values must be between 1 and 60.')
@@ -117,6 +118,10 @@ def run_lottery():
     # If current unplayed winning draw exists.
     if current_winning_draw:
 
+        # Decrypt the winning draw.
+        winning_draw_copy = copy.deepcopy(current_winning_draw)
+        winning_draw_copy.view_draw(current_user.draw_key)
+
         # Get all unplayed user draws.
         user_draws = Draw.query.filter_by(win=False, played=False).all()
         results = []
@@ -135,15 +140,20 @@ def run_lottery():
                 # Get the owning user (instance/object)
                 user = User.query.filter_by(id=draw.user_id).first()
 
+                # Decrypt the user draw.
+                draw_copy = copy.deepcopy(draw)
+                draw_copy.view_draw(user.draw_key)
+
                 # If user draw matches current unplayed winning draw.
-                if draw.draw == current_winning_draw.draw:
+                if draw_copy.draw == winning_draw_copy.draw:
 
                     # Add details of winner to list of results.
-                    results.append((current_winning_draw.round, draw.draw, draw.user_id, user.email))
+                    results.append((current_winning_draw.round, draw_copy.draw, draw.user_id, user.email))
 
                     # Update draw as a winning draw (this will be used to highlight winning draws in the user's
                     # lottery page).
                     draw.match = True
+                    draw.win = True
 
                 # Update draw as played.
                 draw.played = True

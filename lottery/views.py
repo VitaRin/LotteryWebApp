@@ -36,6 +36,7 @@ def add_draw():
             valid = False
             flash('Please do not leave any values blank.')
         else:
+            # If the value isn't blank, check if it's within allowed range.
             if int(input_draw) > 60 or int(input_draw) < 1:
                 valid = False
                 flash('Draw values must be between 1 and 60.')
@@ -122,8 +123,9 @@ def check_draws():
 @login_required
 @requires_roles('user')
 def play_again():
-    delete_played = Draw.__table__.delete().where(Draw.played, user_id=current_user.id)
-    db.session.execute(delete_played)
+    delete_played = Draw.query.filter_by(played=True, user_id=current_user.id).all()
+    for draw in delete_played:
+        db.session.delete(draw)
     db.session.commit()
 
     flash("All played draws deleted.")

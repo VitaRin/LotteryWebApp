@@ -112,7 +112,6 @@ if __name__ == "__main__":
     def load_user(id):
         return User.query.get(int(id))
 
-
     # BLUEPRINTS
     # Import blueprints
     from users.views import users_blueprint
