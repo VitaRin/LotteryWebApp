@@ -36,8 +36,11 @@ def add_draw():
             valid = False
             flash('Please do not leave any values blank.')
         else:
-            submitted_draw += input_draw
-            submitted_draw += ' '
+            if int(input_draw) > 60 or int(input_draw) < 1:
+                valid = False
+                flash('Draw values must be between 1 and 60.')
+            else:
+                submitted_draw += input_draw + ' '
 
     # If no values were left blank, create a new draw and add it to the database.
     if valid:
