@@ -47,22 +47,35 @@ def create_winning_draw():
         db.session.delete(current_winning_draw)
         db.session.commit()
 
-    # Get new winning draw entered in form.
+    # Create an empty submitted draws string.
     submitted_draw = ''
+    # Create a boolean showing the validity of the draw.
+    valid = True
+    # Add input draws to the submitted draws string.
     for i in range(6):
-        submitted_draw += request.form.get('no' + str(i + 1)) + ' '
-    # Remove any surrounding whitespace.
-    submitted_draw.strip()
+        input_draw = request.form.get('no' + str(i + 1))
+        # If one of the values is blank, flash a message and set the boolean to false.
+        if input_draw == '':
+            valid = False
+            flash('Please do not leave any values blank.')
+        else:
+            submitted_draw += input_draw
+            submitted_draw += ' '
 
-    # Create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=current_user.id, draw=submitted_draw, win=True, round=round, draw_key=current_user.draw_key)
+    # If no values were left blank, create a new draw and add it to the database.
+    if valid:
+        submitted_draw.strip()
 
-    # Add the new winning draw to the database.
-    db.session.add(new_winning_draw)
-    db.session.commit()
+        # Create a new draw object with the form data.
+        new_winning_draw = Draw(user_id=current_user.id, draw=submitted_draw, win=True, round=round,
+                                draw_key=current_user.draw_key)
 
-    # Re-render admin page.
-    flash("New winning draw added.")
+        # Add the new winning draw to the database.
+        db.session.add(new_winning_draw)
+        db.session.commit()
+
+        # Re-render admin page.
+        flash("New winning draw added.")
     return admin()
 
 
