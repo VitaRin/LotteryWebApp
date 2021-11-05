@@ -8,6 +8,7 @@ from werkzeug.security import check_password_hash
 from app import db, requires_roles
 from models import User
 from users.forms import RegisterForm, LoginForm
+import pyotp
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
@@ -89,23 +90,28 @@ def login():
 
             return render_template('login.html', form=form)
 
-        # If user is verified reset login attempts to 0.
-        session['logins'] = 0
+        if pyotp.TOTP(user.pin_key).verify(form.pin.data):
+            # If user is verified reset login attempts to 0.
+            session['logins'] = 0
 
-        login_user(user)
+            login_user(user)
 
-        # Update the user's last and current login times.
-        user.last_logged_in = user.current_logged_in
-        user.current_logged_in = datetime.now()
-        db.session.commit()
+            # Update the user's last and current login times.
+            user.last_logged_in = user.current_logged_in
+            user.current_logged_in = datetime.now()
+            db.session.commit()
 
-        # Update logs that a user has logged in.
-        logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
+            # Update logs that a user has logged in.
+            logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
 
-        if current_user.role == 'admin':
-            return redirect(url_for('admin.admin'))
+            # Redirect users to role appropriate pages.
+            if current_user.role == 'admin':
+                return redirect(url_for('admin.admin'))
+            else:
+                return redirect(url_for('users.profile'))
+
         else:
-            return redirect(url_for('users.profile'))
+            flash("You have supplied an invalid 2FA token!", "danger")
 
     return render_template('login.html', form=form)
 
