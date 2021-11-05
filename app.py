@@ -14,7 +14,7 @@ class SecurityFilter(logging.Filter):
         return "SECURITY" in record.getMessage()
 
 
-fh = logging.FileHandler('lottery.log', 'a')
+fh = logging.FileHandler('lottery.log', 'w')
 fh.setLevel(logging.WARNING)
 fh.addFilter(SecurityFilter())
 formatter = logging.Formatter('%(asctime)s : %(message)s', '%m/%d/%Y %I:%M:%S %p')
