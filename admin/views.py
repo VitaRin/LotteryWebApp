@@ -158,7 +158,7 @@ def run_lottery():
 @login_required
 @requires_roles('admin')
 def logs():
-    with open("C:/Users/VitaV/OneDrive/Newcastle University/CSC2031/LotteryWebApp1/lottery.log", "r") as f:
+    with open("lottery.log", "r") as f:
         content = f.read().splitlines()[-10:]
         content.reverse()
 
